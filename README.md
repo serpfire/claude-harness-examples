@@ -6,16 +6,39 @@ Every file here started as something that cost me. A scar became a rule; the rul
 
 ---
 
-## The four-layer model
+## The five-layer model
 
-Every file in this repo is one of four layers. Understand the layers and you can build your own:
+Every file in this repo is one of five layers. Understand the layers and you can build your own:
 
 - **Rules teach.** Plain text. Readable. Loaded into your Claude Code session at startup. A rule is what you've learned, written down so future-you (and Claude) can honor it. → [Claude Code memory docs](https://docs.claude.com/en/docs/claude-code/memory)
 - **Hooks enforce.** Code. Automatic. Fires before you can do the wrong thing. A hook is the discipline you don't trust yourself to remember at 11 PM. → [Claude Code hooks guide](https://docs.claude.com/en/docs/claude-code/hooks-guide) · [hooks reference](https://docs.claude.com/en/docs/claude-code/hooks)
 - **Skills automate.** Named workflows. Playbooks you got tired of re-explaining. Invoked with a slash command. → [Claude Code skills docs](https://docs.claude.com/en/docs/claude-code/skills)
+- **Agents delegate.** Parallel workers you dispatch for independent slices. Raw data stays in the sub-agent's context, not yours. → [Claude Code sub-agents docs](https://docs.claude.com/en/docs/claude-code/sub-agents)
 - **Verbs command.** Operating modes. One word activates a whole discipline. A verb is a gate you've chosen to run through. → [Claude Code slash commands](https://docs.claude.com/en/docs/claude-code/slash-commands)
 
 Together they build a version of you that can't cut corners.
+
+## The promotion loop
+
+You don't build the whole harness on day one. You **promote** one artifact at a time:
+
+```
+SCAR  ─▶  RULE  ─▶  HOOK  ─▶  SKILL/AGENT  ─▶  VERB
+       (write it  (keep breaking (procedure    (mode you
+       down)       the rule)      repeats)     flip into)
+```
+
+Every new Claude model release, re-audit which layer each thing belongs in. Things that were rules become hooks. Skills become agents. That's the engine.
+
+## Severity tiers
+
+Not all work deserves the same rules. Tag tasks as one of three tiers before you start:
+
+- **Trivial** — typos, one-line fixes, mechanical changes. Minimum ceremony.
+- **Standard** — contained feature, 20–200 lines. Run the usual checks.
+- **Heavy** — resilience, data flow, infrastructure, anything where "works most of the time" is unacceptable. Full rules, full strength.
+
+Scaling rules to task size stops the harness from feeling like bureaucracy.
 
 **Official Claude Code docs as a set:**
 - [Overview](https://docs.claude.com/en/docs/claude-code/overview) — start here if you're new
@@ -23,6 +46,7 @@ Together they build a version of you that can't cut corners.
 - [Hooks guide](https://docs.claude.com/en/docs/claude-code/hooks-guide) — concepts and use cases
 - [Hooks reference](https://docs.claude.com/en/docs/claude-code/hooks) — JSON contract + events
 - [Skills](https://docs.claude.com/en/docs/claude-code/skills) — SKILL.md format and invocation
+- [Sub-agents](https://docs.claude.com/en/docs/claude-code/sub-agents) — delegation and parallel work
 - [Slash commands](https://docs.claude.com/en/docs/claude-code/slash-commands) — how to wire verbs
 - [Settings](https://docs.claude.com/en/docs/claude-code/settings) — permissions, env vars, precedence
 - [Plugins reference](https://docs.claude.com/en/docs/claude-code/plugins-reference) — packaging the above as shareable plugins
