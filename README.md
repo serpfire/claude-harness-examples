@@ -77,6 +77,14 @@ Scaling rules to task size stops the harness from feeling like bureaucracy.
 - Two phases, before coding and before claiming done. Phase A makes you solve the problem right (not just minimally). Phase B is five checks that run before any "done" claim — with a hard gate that you exercise the feature like a user in the same message as the done claim, with concrete evidence (curl output, screenshot, query result).
 - This rule fixed more bugs-on-arrival than any other change I made. Steal it wholesale.
 
+### `skills/qa-explore-template.md` — autonomous visual QA
+
+My highest-leverage skill. **Claude logs into my deployed app, navigates a workflow, takes screenshots, reads its own screenshots, inspects API responses, and reports findings. I do nothing.** Template version — swap in your auth helper, test config, and URL patterns.
+
+- Before I ship any page, I run `/qa-explore /app/my-page`. Four minutes later I have a pass/fail verdict with evidence.
+- The advanced discipline isn't automating the action. It's **automating the verification** — skills that read their own output.
+- Apply this pattern to anything visual: reports, dashboards, client deliverables, onboarding flows.
+
 ### `skills/learned/` — two post-mortem skills
 
 After a non-trivial debugging session, I extract the pattern into a skill file so Claude (and future-me) can recognize it next time. These two are the most universally useful.
