@@ -1,0 +1,121 @@
+# claude-harness-examples
+
+Six hand-picked artifacts from Noah Learner's Claude Code harness, shared alongside the SEO Week NYC 2026 talk **"Scars."**
+
+Every file here started as something that cost me. A scar became a rule; the rule became a hook or a skill or a verb. This repo is the curated starter kit — the pieces most likely to help you the fastest. It is deliberately *not* my whole harness. Fewer, better, heavily commented.
+
+---
+
+## The four-layer model
+
+Every file in this repo is one of four layers. Understand the layers and you can build your own:
+
+- **Rules teach.** Plain text. Readable. Loaded into your Claude Code session at startup. A rule is what you've learned, written down so future-you (and Claude) can honor it.
+- **Hooks enforce.** Code. Automatic. Fires before you can do the wrong thing. A hook is the discipline you don't trust yourself to remember at 11 PM.
+- **Skills automate.** Named workflows. Playbooks you got tired of re-explaining. Invoked with a slash command.
+- **Verbs command.** Operating modes. One word activates a whole discipline. A verb is a gate you've chosen to run through.
+
+Together they build a version of you that can't cut corners.
+
+---
+
+## What's in this repo
+
+### `hooks/` — two hooks, two scars
+
+**[`database-query-guard.sh`](hooks/database-query-guard.sh)** — The $1,700 scar
+- I wrote one BigQuery query, hit enter, and it cost $1,700. BigQuery charges per byte scanned, not per row returned. You can return 3 rows and scan 340 terabytes. I did.
+- The hook now fires before Claude runs any database query on my machine. It dry-runs, calculates the cost at $5/TB, shows me the number, and asks. I decide every time.
+- Works across 15 database systems (BigQuery, Athena, Snowflake, Postgres, MySQL, SQLite, MongoDB, Redis, DynamoDB, and more). Catches DELETE without WHERE, Redis FLUSHALL, Mongo collection drops — not just cost disasters.
+
+**[`grep-related-occurrences.sh`](hooks/grep-related-occurrences.sh)** — The demo-leak scar
+- I ran a live webinar with real client names visible on the screen. They leaked. I went home, built a masking mode, and then spent the next day finding every place in the code that rendered a client name. I missed four.
+- The hook now fires before every edit. It greps for related occurrences of the pattern you're about to change and asks you to review them before proceeding.
+- Grep-before-edit used to be a rule I had to remember. Now it's a gate I have to walk through.
+
+### `rules/` — two rules that changed how I work
+
+**[`noah-verbs.md`](rules/noah-verbs.md)** — Seven operating-mode verbs
+- `noahloop` (decide), `noahplan` (plan deep, no code until confirmed), `noahship` (deploy gate), `noahcut` (dead-code pass), `noahbot` (delegate + handoff), `noahfix` (autonomous debug), `noahwatch` (live observation).
+- Composable. Rename them. Keep the ones that fit. Invent your own. The value isn't in these specific seven — it's in the pattern: one word loads a whole discipline.
+
+**[`done-means-done.md`](rules/done-means-done.md)** — The forcing function behind everything
+- Two phases, before coding and before claiming done. Phase A makes you solve the problem right (not just minimally). Phase B is five checks that run before any "done" claim — with a hard gate that you exercise the feature like a user in the same message as the done claim, with concrete evidence (curl output, screenshot, query result).
+- This rule fixed more bugs-on-arrival than any other change I made. Steal it wholesale.
+
+### `skills/learned/` — two post-mortem skills
+
+After a non-trivial debugging session, I extract the pattern into a skill file so Claude (and future-me) can recognize it next time. These two are the most universally useful.
+
+**[`kv-rate-limiter-ttl-bug.md`](skills/learned/kv-rate-limiter-ttl-bug.md)** — Why your rate limiter locks users out forever
+- The bug: `expirationTtl` resets the TTL from now on every write. Under active use, the key never expires. Users hit the limit and stay locked out until traffic stops for 60 seconds — which never happens.
+- Applies to any KV store with TTL-based expiration (Cloudflare KV, Redis with `EXPIRE`, DynamoDB TTL).
+
+**[`cloudflare-worker-response-body-leak.md`](skills/learned/cloudflare-worker-response-body-leak.md)** — The silent memory trap
+- The bug: calling `fetch()` and not reading the body (or explicitly cancelling it) keeps the body in memory. Workers cap at 128MB. You'll hit it, and the error message ("A stalled HTTP response was canceled to prevent deadlock") won't tell you what's wrong.
+- The fix is one line: `response.body?.cancel()` on every early-return path.
+- Applies beyond Cloudflare — same trap exists in any runtime with streamed response bodies.
+
+---
+
+## Related public repos
+
+These are separate projects I built while growing the harness. Fork freely:
+
+- **[sterlingsky/claude-deploy-hook](https://github.com/sterlingsky/claude-deploy-hook)** — Multi-provider deploy hook covering 11 platforms (GCP, Firebase, Vercel, Cloudflare, K8s, AWS, Azure, Heroku, Fly.io, Render, Netlify).
+- **[sterlingsky/claude-ship-command](https://github.com/sterlingsky/claude-ship-command)** — The `/ship` slash command that backs `noahship`.
+
+---
+
+## Install
+
+### Hooks (user-global)
+```bash
+mkdir -p ~/.claude/hooks
+cp hooks/*.sh ~/.claude/hooks/
+chmod +x ~/.claude/hooks/*.sh
+```
+Then follow the install steps at the top of each hook to wire it into your Claude Code settings.
+
+### Rules (project-local)
+```bash
+mkdir -p .claude/rules
+cp rules/*.md .claude/rules/
+```
+Import in your `CLAUDE.md`:
+```markdown
+@.claude/rules/noah-verbs.md
+@.claude/rules/done-means-done.md
+```
+
+### Skills (user-global or project-local)
+```bash
+# User-global: lives in ~/.claude/skills/
+mkdir -p ~/.claude/skills/learned
+cp skills/learned/*.md ~/.claude/skills/learned/
+```
+These skills describe *patterns*, not slash commands — Claude reads them as contextual knowledge when relevant situations arise.
+
+---
+
+## Three things to do tonight
+
+If you only take away three moves from this repo:
+
+1. **Install `database-query-guard.sh`.** Five minutes. Saves a disaster.
+2. **Copy `noah-verbs.md`, rename the verbs to fit your workflow**, and start using one.
+3. **When a bug bites you twice, write a rule within the hour.** The rules in this repo all started that way.
+
+That's the whole starter kit. Everything else compounds from those three moves.
+
+---
+
+## License
+
+MIT. Fork, modify, share. If something here helps, reach out — I'd love to hear about it.
+
+---
+
+## About the talk
+
+This repo drops alongside **"Scars"** at SEO Week NYC, April 27, 2026. The talk is about turning scars into infrastructure. This repo is the infrastructure. If a QR code in the deck brought you here, welcome — take what's useful.
