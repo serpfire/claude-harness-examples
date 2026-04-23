@@ -85,7 +85,7 @@ My highest-leverage skill. **Claude logs into my deployed app, navigates a workf
 - The advanced discipline isn't automating the action. It's **automating the verification** — skills that read their own output.
 - Apply this pattern to anything visual: reports, dashboards, client deliverables, onboarding flows.
 
-### `skills/handoff.md` — cash out a long session at 50%, not 80%
+### `skills/handoff.md` — cash out a long session at 80% left, not 50% or 20%
 
 Context is an attention economy. Every token spent on a stale conversation is a token not available for the work. `/handoff` generates a structured summary of the current session from conversation memory (no file re-reads), copies it to the clipboard, and you paste it as the first message of a fresh session.
 
