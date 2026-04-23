@@ -1,6 +1,6 @@
 # claude-harness-examples
 
-Six hand-picked artifacts from Noah Learner's Claude Code harness, shared alongside the SEO Week NYC 2026 talk **"Scars."**
+Hand-picked artifacts from Noah Learner's Claude Code harness, shared alongside the SEO Week NYC 2026 talk **"Scars."**
 
 Every file here started as something that cost me. A scar became a rule; the rule became a hook or a skill or a verb. This repo is the curated starter kit — the pieces most likely to help you the fastest. It is deliberately *not* my whole harness. Fewer, better, heavily commented.
 
@@ -85,6 +85,15 @@ My highest-leverage skill. **Claude logs into my deployed app, navigates a workf
 - The advanced discipline isn't automating the action. It's **automating the verification** — skills that read their own output.
 - Apply this pattern to anything visual: reports, dashboards, client deliverables, onboarding flows.
 
+### `skills/handoff.md` — cash out a long session at 50%, not 80%
+
+Context is an attention economy. Every token spent on a stale conversation is a token not available for the work. `/handoff` generates a structured summary of the current session from conversation memory (no file re-reads), copies it to the clipboard, and you paste it as the first message of a fresh session.
+
+- Run it at **task boundaries, phase boundaries, and any time Claude is summarizing earlier work to stay oriented** — that's the signal the window is already bloated.
+- Typical savings: ~90% token reduction vs. letting the session auto-compact.
+- The `<next_action>` field is the most load-bearing part — make it specific enough that the fresh Claude session can start without clarifying questions.
+- Clipboard commands included for macOS, Linux (X11/Wayland), and Windows (WSL).
+
 ### `skills/learned/` — two post-mortem skills
 
 After a non-trivial debugging session, I extract the pattern into a skill file so Claude (and future-me) can recognize it next time. These two are the most universally useful.
@@ -130,13 +139,22 @@ Import in your `CLAUDE.md`:
 @.claude/rules/done-means-done.md
 ```
 
-### Skills (user-global or project-local)
+### Skills — two flavors
+
+**Invokable skills (slash commands like `/handoff` or `/qa-explore`)** live under `~/.claude/commands/`:
 ```bash
-# User-global: lives in ~/.claude/skills/
+mkdir -p ~/.claude/commands
+cp skills/handoff.md ~/.claude/commands/handoff.md
+cp skills/qa-explore-template.md ~/.claude/commands/qa-explore.md
+```
+Invoke with `/handoff`, `/qa-explore`, etc. Can also live project-local at `<repo>/.claude/commands/`.
+
+**Pattern skills (contextual knowledge, not commands)** live under `~/.claude/skills/`:
+```bash
 mkdir -p ~/.claude/skills/learned
 cp skills/learned/*.md ~/.claude/skills/learned/
 ```
-These skills describe *patterns*, not slash commands — Claude reads them as contextual knowledge when relevant situations arise.
+These describe *patterns* — Claude reads them as context when a matching situation arises. Not invoked directly.
 
 ---
 
