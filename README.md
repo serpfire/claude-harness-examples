@@ -77,6 +77,16 @@ Scaling rules to task size stops the harness from feeling like bureaucracy.
 - Two phases, before coding and before claiming done. Phase A makes you solve the problem right (not just minimally). Phase B is five checks that run before any "done" claim — with a hard gate that you exercise the feature like a user in the same message as the done claim, with concrete evidence (curl output, screenshot, query result).
 - This rule fixed more bugs-on-arrival than any other change I made. Steal it wholesale.
 
+**[`loud-failures.md`](rules/loud-failures.md)** — Four sub-rules that kill silent degradation
+- No `Promise.all` with `.catch(() => [])`. Never return placeholder state without a follow-up. Registries must include every alias. Every aggregating endpoint surfaces `_diagnostic`.
+- They share one root cause: *the system continued executing after partial failure without telling anyone.* One file, one rule to remember.
+- The first time I added `_diagnostic` to a single aggregating route, I surfaced 5+ silent bugs that had been live for weeks. This rule pays for itself on day one.
+
+**[`grep-before-edit.md`](rules/grep-before-edit.md)** — The scope-vs-creep rule
+- Before modifying any pattern: grep the whole codebase, list every match, fix them all in one pass. Never fix one file and wait for the user to report the next.
+- Includes the "scope vs. creep worked examples" table — the framework for distinguishing legitimate full-scope fixes from actual scope creep.
+- Pairs with `hooks/grep-related-occurrences.sh` — the rule teaches the discipline; the hook enforces it when muscle memory fails.
+
 ### `skills/qa-explore-template.md` — autonomous visual QA
 
 My highest-leverage skill. **Claude logs into my deployed app, navigates a workflow, takes screenshots, reads its own screenshots, inspects API responses, and reports findings. I do nothing.** Template version — swap in your auth helper, test config, and URL patterns.
@@ -93,6 +103,28 @@ Context is an attention economy. Every token spent on a stale conversation is a 
 - Typical savings: ~90% token reduction vs. letting the session auto-compact.
 - The `<next_action>` field is the most load-bearing part — make it specific enough that the fresh Claude session can start without clarifying questions.
 - Clipboard commands included for macOS, Linux (X11/Wayland), and Windows (WSL).
+
+### `skills/docs-update-template.md` — living docs from source code
+
+Most in-app documentation is stale before it ships. Someone wrote it once, renamed a button, and the doc is now lying to your users. **This skill fixes the ongoing version of that problem: every time a feature changes, the doc regenerates from the current code.** Markdown content plus screenshots, both kept honest.
+
+- Seven modes: `check`, `generate <slug>`, `generate-all` (parallel subagents), `update`, `update-all`, `screenshots`, `bootstrap <slug>`.
+- Reads your view files + API routes + state, writes structured markdown, captures a screenshot via your test runner, optimizes to WebP at quality 80.
+- Stack-agnostic template — works for Vue, React, Next.js, Svelte, any framework with "a view, a route, and a markdown destination."
+- Pair with a `feature-registry` rule for the "every new view gets a doc entry" convention, or wire a `PostToolUse` hook for true on-change automation.
+- This is the skill behind the `docs(auto):` sync commits — docs can't go stale because they're generated from the same source of truth as the UI.
+
+### `skills/parallel.md` — parallel subagents + sandboxed data gathering
+
+The three most expensive mistakes new Claude Code users make: (1) dispatching sub-agents sequentially when they could run in parallel, (2) pulling raw tool output back into the parent context, (3) spawning a full sub-agent for pure data-gathering tasks that a sandboxed script would handle in one call.
+
+This skill replaces all three with one discipline:
+- **One message, N agents.** Never serialize independent work.
+- **Sandbox the raw data.** Every subagent prompt includes "keep raw bytes in the sandbox" — logs, query results, and large file reads never enter a context window.
+- **Word-capped output contracts.** Every subagent prompt ends with "Report under 150 words. File paths + findings only. No raw data dumps."
+- **Right-sized agents.** Haiku/Explore for grep; Sonnet for reasoning; Opus only for deep architecture.
+
+Typical savings: 10×+ on wall-clock, 50×+ on tokens for research-heavy tasks.
 
 ### `skills/learned/` — two post-mortem skills
 
